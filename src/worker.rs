@@ -219,6 +219,24 @@ pub struct Analysis {
     pub vmaf_b: Option<Result<f64, String>>,
 }
 
+impl Analysis {
+    /// Меняет местами результаты для A и B (когда пользователь поменял файлы местами).
+    pub fn swap_ab(&mut self, has_ref: bool) {
+        if has_ref {
+            if let Some(sa) = self.a.take() {
+                let old_b = std::mem::replace(&mut self.b, sa);
+                self.a = Some(old_b);
+            }
+            std::mem::swap(&mut self.vmaf_a, &mut self.vmaf_b);
+        } else {
+            // Без оригинала ряд описывает пару "B относительно A". PSNR и SSIM симметричны,
+            // поэтому после обмена он остаётся верным. VMAF несимметричен (эталон/проверяемое),
+            // и после обмена его значение уже не относится к новой паре.
+            self.vmaf_b = None;
+        }
+    }
+}
+
 pub enum AnalysisMsg {
     Progress(usize),
     Status(String),

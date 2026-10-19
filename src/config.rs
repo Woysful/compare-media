@@ -1,6 +1,6 @@
 //! Настройки приложения и выбор графического сервера (Wayland / X11 через XWayland).
 //!
-//! Файл настроек: $XDG_CONFIG_HOME/visual-diff/config.txt (или ~/.config/visual-diff/config.txt),
+//! Файл настроек: $XDG_CONFIG_HOME/compare-media/config.txt (или ~/.config/compare-media/config.txt),
 //! простой формат "ключ=значение".
 
 use crate::i18n::{tr, trf, Lang};
@@ -55,19 +55,33 @@ impl Default for Config {
     }
 }
 
-fn config_path() -> Option<PathBuf> {
+fn config_path_in(dir: &str) -> Option<PathBuf> {
     let base = std::env::var_os("XDG_CONFIG_HOME")
         .map(PathBuf::from)
         .filter(|p| p.is_absolute())
         .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?;
-    Some(base.join("visual-diff").join("config.txt"))
+    Some(base.join(dir).join("config.txt"))
+}
+
+fn config_path() -> Option<PathBuf> {
+    config_path_in("compare-media")
+}
+
+/// Папка настроек из прежних версий (программа раньше называлась visual-diff).
+fn legacy_config_path() -> Option<PathBuf> {
+    config_path_in("visual-diff")
 }
 
 impl Config {
     pub fn load() -> Self {
         let mut cfg = Config::default();
         let Some(path) = config_path() else { return cfg };
-        let Ok(text) = std::fs::read_to_string(path) else { return cfg };
+        // Если новых настроек ещё нет, подхватываем старые (из папки visual-diff).
+        let text = std::fs::read_to_string(&path).or_else(|e| match legacy_config_path() {
+            Some(old) => std::fs::read_to_string(old),
+            None => Err(e),
+        });
+        let Ok(text) = text else { return cfg };
 
         for line in text.lines() {
             let Some((k, v)) = line.split_once('=') else { continue };

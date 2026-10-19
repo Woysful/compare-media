@@ -132,7 +132,7 @@ static TABLE: &[(&str, &str, &str)] = &[
     ("could not read any frames (is ffmpeg installed?)", "не удалось прочитать ни одного кадра (ffmpeg установлен?)", "не вдалося прочитати жодного кадру (ffmpeg встановлено?)"),
     ("Computing VMAF…", "Считаю VMAF…", "Рахую VMAF…"),
     // ----- CLI -----
-    ("Usage: visual-diff --cli <A> <B> [out.png]", "Использование: visual-diff --cli <A> <B> [out.png]", "Використання: visual-diff --cli <A> <B> [out.png]"),
+    ("Usage: compare-media --cli <A> <B> [out.png]", "Использование: compare-media --cli <A> <B> [out.png]", "Використання: compare-media --cli <A> <B> [out.png]"),
     ("Error: {0}", "Ошибка: {0}", "Помилка: {0}"),
     ("Saved: {0}  (left: A, center: B, right: difference)", "Сохранено: {0}  (слева A, по центру B, справа разница)", "Збережено: {0}  (ліворуч A, по центру B, праворуч різниця)"),
     ("failed to run ffmpeg (is it installed and in PATH?): {0}", "не удалось запустить ffmpeg (он установлен и есть в PATH?): {0}", "не вдалося запустити ffmpeg (він встановлений і є в PATH?): {0}"),

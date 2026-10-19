@@ -34,12 +34,12 @@ pub fn run(files: Vec<String>, cfg: Config) {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1360.0, 860.0])
             .with_min_inner_size([920.0, 560.0])
-            .with_title("Visual Diff")
-            .with_app_id("visual-diff"),
+            .with_title("Compare Media")
+            .with_app_id("compare-media"),
         ..Default::default()
     };
     let result = eframe::run_native(
-        "Visual Diff",
+        "Compare Media",
         options,
         Box::new(move |cc| {
             apply_style(&cc.egui_ctx, cfg.theme);
@@ -141,6 +141,8 @@ struct App {
 
     analysis: Option<Analysis>,
     running: Option<AnalysisHandle>,
+    /// A и B поменяли местами, пока шёл анализ: результат нужно развернуть по завершении.
+    analysis_swapped: bool,
     progress: usize,
     status: String,
     want_vmaf: bool,
@@ -247,6 +249,7 @@ impl App {
             error: None,
             analysis: None,
             running: None,
+            analysis_swapped: false,
             progress: 0,
             status: String::new(),
             want_vmaf: false,
@@ -272,7 +275,21 @@ impl App {
             h.cancel.store(true, Ordering::Relaxed);
         }
         self.running = None;
+        self.analysis_swapped = false;
         self.status.clear();
+    }
+
+    /// Меняет A и B местами, сохраняя результаты анализа (график на таймлайне).
+    fn swap_ab(&mut self) {
+        std::mem::swap(&mut self.a, &mut self.b);
+        let has_ref = self.r.is_some();
+        if let Some(an) = self.analysis.as_mut() {
+            an.swap_ab(has_ref);
+        }
+        if self.running.is_some() {
+            self.analysis_swapped = !self.analysis_swapped;
+        }
+        self.need_request = self.a.is_some() && self.b.is_some();
     }
 
     fn set_media(&mut self, slot: Slot, path: PathBuf) {
@@ -399,6 +416,7 @@ impl App {
                 self.progress = 0;
                 self.status.clear();
                 self.running = Some(h);
+                self.analysis_swapped = false;
                 self.analysis = None;
             }
             Err(e) => self.error = Some(e),
@@ -434,9 +452,15 @@ impl App {
             self.running = None;
             self.status.clear();
             match r {
-                Ok(a) => self.analysis = Some(a),
+                Ok(mut a) => {
+                    if self.analysis_swapped {
+                        a.swap_ab(self.r.is_some());
+                    }
+                    self.analysis = Some(a);
+                }
                 Err(e) => self.error = Some(e),
             }
+            self.analysis_swapped = false;
         }
     }
 
@@ -544,17 +568,14 @@ impl App {
         egui::TopBottomPanel::top("top").show(ctx, |ui| {
             ui.add_space(6.0);
             ui.horizontal(|ui| {
-                ui.label(RichText::new("Visual Diff").strong().size(16.0));
+                ui.label(RichText::new("Compare Media").strong().size(16.0));
                 ui.separator();
                 for slot in [Slot::A, Slot::B, Slot::R] {
                     self.slot_ui(ui, slot);
                     ui.add_space(4.0);
                 }
                 if ui.button(tr("Swap A and B")).clicked() {
-                    std::mem::swap(&mut self.a, &mut self.b);
-                    self.cancel_analysis();
-                    self.analysis = None;
-                    self.need_request = self.a.is_some() && self.b.is_some();
+                    self.swap_ab();
                 }
                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                     if ui.button(tr("⚙ Settings")).clicked() {

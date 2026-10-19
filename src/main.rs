@@ -1,11 +1,11 @@
-//! Visual Diff — compare two images or videos.
+//! Compare Media — compare two images or videos.
 //!
-//!   visual-diff                         GUI
-//!   visual-diff A B [original]          GUI with files opened (3rd file = original/reference)
-//!   visual-diff --lang en|ru|uk ...     interface language for this run (not saved)
-//!   visual-diff --x11 ...               force X11/XWayland for this run (not saved)
-//!   visual-diff --wayland ...           force Wayland for this run (not saved)
-//!   visual-diff --cli A B [out.png]     console mode
+//!   compare-media                         GUI
+//!   compare-media A B [original]          GUI with files opened (3rd file = original/reference)
+//!   compare-media --lang en|ru|uk ...     interface language for this run (not saved)
+//!   compare-media --x11 ...               force X11/XWayland for this run (not saved)
+//!   compare-media --wayland ...           force Wayland for this run (not saved)
+//!   compare-media --cli A B [out.png]     console mode
 
 mod cli;
 mod config;

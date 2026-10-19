@@ -1,6 +1,6 @@
 [package]
-name = "visual-diff"
-version = "1.0.0"
+name = "compare-media"
+version = "1.0.1"
 edition = "2021"
 
 [dependencies]

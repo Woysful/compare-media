@@ -1,4 +1,4 @@
-//! Console mode: visual-diff --cli <A> <B> [out.png]
+//! Console mode: compare-media --cli <A> <B> [out.png]
 
 use crate::diff::{self, Stats};
 use crate::i18n::{tr, trf};
@@ -16,7 +16,7 @@ const DIFF_GAIN: u32 = 4;
 
 pub fn run(args: &[String]) {
     if args.len() < 2 {
-        eprintln!("{}", tr("Usage: visual-diff --cli <A> <B> [out.png]"));
+        eprintln!("{}", tr("Usage: compare-media --cli <A> <B> [out.png]"));
         std::process::exit(1);
     }
     let (a, b) = (&args[0], &args[1]);

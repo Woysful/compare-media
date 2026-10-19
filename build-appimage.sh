@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build visual-diff into an AppImage.
+# Build compare-media into an AppImage.
 #
 # Usage:
 #   ./build-appimage.sh
@@ -18,7 +18,7 @@ set -euo pipefail
 
 cd "$(dirname "$(readlink -f "$0")")"
 
-APP_NAME="visual-diff"
+APP_NAME="compare-media"
 VERSION="$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')"
 ARCH="${ARCH:-$(uname -m)}"
 
@@ -65,13 +65,13 @@ chmod +x "$APPDIR/AppRun"
 cat > "$APPDIR/$APP_NAME.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Visual Diff
+Name=Compare Media
 Comment=Compare images and videos: zoom, wipe, PSNR/SSIM/VMAF
 Exec=$APP_NAME
 Icon=$APP_NAME
 Categories=Graphics;Utility;
 Terminal=false
-StartupWMClass=visual-diff
+StartupWMClass=compare-media
 EOF
 
 # 5. Icon (simple SVG placeholder: two squares and an arrow between them)
