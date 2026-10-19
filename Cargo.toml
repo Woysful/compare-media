@@ -1,0 +1,12 @@
+[package]
+name = "visual-diff"
+version = "0.3.0"
+edition = "2021"
+
+[dependencies]
+image = "0.25"
+eframe = "0.29"
+rfd = "0.15"
+
+[profile.release]
+opt-level = 3
